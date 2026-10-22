@@ -129,7 +129,7 @@ export function ThemeButton() {
   );
 }
 
-const ROW = 112;
+const ROW = 138;
 
 function CourseMap({ onOpen, currentId }: { onOpen: (id: string) => void; currentId: string | null }) {
   const s = useAppState();

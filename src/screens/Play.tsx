@@ -132,9 +132,12 @@ function ProblemView({ pid }: { pid: string }) {
 
   const skipped = chapters.filter((c) => isSkipped(s, c)).map((c) => c.num);
   const tags = useMemo(() => {
+    // 同じ章の案内は、最初に出てくる行に1回だけ
     const m = new Map<number, number[]>();
+    const seen = new Set<number>();
     codeLines.forEach((l, i) => {
-      const hits = detectChapters(l, skipped, ref.chapter.num);
+      const hits = detectChapters(l, skipped, ref.chapter.num).filter((n) => !seen.has(n));
+      hits.forEach((n) => seen.add(n));
       if (hits.length) m.set(i, hits);
     });
     return m;
@@ -369,7 +372,7 @@ function ProblemView({ pid }: { pid: string }) {
   const chapter = ref.chapter;
   const left = lessonsLeft(s, chapter);
   const headTitle =
-    kind === "lesson" ? `第${chapter.num}章 ${lessonInfo?.lesson.title}`
+    kind === "lesson" ? `${chapter.num === 15 ? "卒業試験" : `第${chapter.num}章`} ${lessonInfo?.lesson.title}`
       : kind === "check" ? `第${chapter.num}章 理解度チェック`
         : kind === "review" ? "復習"
           : "レベル診断";

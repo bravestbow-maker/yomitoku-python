@@ -1509,7 +1509,7 @@
    "id": "c3",
    "title": "型と変換",
    "desc": "int()、str()、float()、f文字列、input()",
-   "detect": "int\\(|str\\(|float\\(|f\\\"|f'|input\\(",
+   "detect": "\\b(int|str|float|input)\\(|\\bf\\\"|\\bf'",
    "lessons": [
     {
      "id": "c3-l1",
@@ -2737,7 +2737,7 @@
    "id": "c5",
    "title": "リスト",
    "desc": "番号での取り出し、スライス、len()、append()、in",
-   "detect": "\\[.*\\]|\\.append\\(|len\\(",
+   "detect": "\\w\\[|\\.append\\(|\\blen\\(",
    "lessons": [
     {
      "id": "c5-l1",
