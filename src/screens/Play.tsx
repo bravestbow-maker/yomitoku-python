@@ -237,6 +237,13 @@ function ProblemView({ pid }: { pid: string }) {
   }
 
   function apply(v: Verdict, text: string) {
+    if (v.near) {
+      // 惜しい：間違いの回数には数えず、そのまま入力し直せる
+      setLog((l) => [...l, { kind: "info", text: v.note ?? "惜しい！" }]);
+      setMood("think");
+      setInput(text);
+      return;
+    }
     const before = getState();
     const lvBefore = levelOf(before.xp);
     const badges: string[] = [];
@@ -254,7 +261,7 @@ function ProblemView({ pid }: { pid: string }) {
       setMood(c >= 2 ? "combo" : "happy");
       if (c >= 2) sfx.combo(c);
       else sfx.correct();
-      setLog((l) => [...l, { kind: "ok", text: `正解！ +${gained}XP` }]);
+      setLog((l) => [...l, { kind: "ok", text: `正解！ +${gained}XP` }, ...(v.note ? [{ kind: "info" as const, text: v.note }] : [])]);
       if (navigator.vibrate) navigator.vibrate(15);
       stopMode();
       setInput("");

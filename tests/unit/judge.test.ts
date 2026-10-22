@@ -39,6 +39,8 @@ describe("ゆるい比較", () => {
     expect(blankEq("Ken", '"Ken"')).toBe(true);
     expect(blankEq("ひく", "足す")).toBe(false);
     expect(blankEq("", "")).toBe(false);
+    expect(blankEq("埋め込んだ", "うめこんだ")).toBe(true);
+    expect(blankEq("余り", "あまり")).toBe(true);
   });
 });
 
@@ -48,10 +50,38 @@ describe("判定", () => {
     expect(judgeText(p, "0\n1\n2").ok).toBe(true);
     expect(judgeText(p, "0\n1\n3")).toEqual({ ok: false, wrongLine: 3 });
   });
-  it("エラーの種類名を当てる", () => {
+  it("エラーの種類名を当てる：大文字小文字や1〜2文字のつづりちがいは正解にして、正しいつづりを示す", () => {
     const p = P("c12-l1-p1");
-    expect(judgeText(p, "ZeroDivisionError").ok).toBe(true);
-    expect(judgeText(p, "zerodivisionerror").ok).toBe(false);
+    expect(judgeText(p, "ZeroDivisionError")).toEqual({ ok: true });
+    expect(judgeText(p, "ZeroDevisionError")).toMatchObject({ ok: true, note: expect.stringContaining("ZeroDivisionError") });
+    expect(judgeText(p, "zerodivisionerror").ok).toBe(true);
+    expect(judgeText(p, "ZeroDivisionError: division by zero").ok).toBe(true);
+    expect(judgeText(p, "ZeroError").ok).toBe(false);
+    expect(judgeText(p, "TypeError").ok).toBe(false);
+  });
+  it("別のエラー名と取りちがえたら不正解", () => {
+    const v = P("c12-l1-p5"); // ValueError
+    expect(judgeText(v, "ValueEror").ok).toBe(true);
+    expect(judgeText(v, "TypeError").ok).toBe(false);
+    expect(judgeText(v, "NameError").ok).toBe(false);
+  });
+  it("型の問題は int のように型の名前だけでも正解", () => {
+    const p = P("c3-l1-p1"); // <class 'int'>
+    expect(judgeText(p, "<class 'int'>")).toEqual({ ok: true });
+    expect(judgeText(p, "int")).toMatchObject({ ok: true, note: expect.stringContaining("<class 'int'>") });
+    expect(judgeText(p, "class int").ok).toBe(true);
+    expect(judgeText(p, "str").ok).toBe(false);
+  });
+  it("True / False / None は小文字で書いても正解", () => {
+    expect(judgeText(P("c0-l2-p2"), "true")).toMatchObject({ ok: true, note: expect.stringContaining("True") });
+    expect(judgeText(P("c7-l3-p4"), "true\nfalse").ok).toBe(true);
+    expect(judgeText(P("c12-l4-p5"), "none").ok).toBe(true);
+    expect(judgeText(P("c0-l2-p2"), "false").ok).toBe(false);
+  });
+  it("小数の .0 だけ抜けたら「惜しい」（不正解だが間違いに数えない）", () => {
+    expect(judgeText(P("c1-l3-p2"), "3")).toMatchObject({ ok: false, near: true });
+    expect(judgeText(P("c13-l3-p5"), "Ken 80")).toMatchObject({ ok: false, near: true });
+    expect(judgeText(P("c1-l3-p2"), "4").near).toBeUndefined();
   });
   it("値を追う：文字列は引用符があってもなくても正解", () => {
     const p = P("c2-l2-p5"); // name -> "Ami"

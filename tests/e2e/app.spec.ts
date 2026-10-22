@@ -347,3 +347,15 @@ test("通して音読：1行ずつ答え合わせして最後まで読める", a
   for (let i = 0; i < 40 && (await step.textContent()) !== "マップへ"; i++) await step.click();
   await expect(page.getByText("最後まで読めました")).toBeVisible();
 });
+
+test("つづりちがいのエラー名は正解にして正しいつづりを示し、.0 抜けは「惜しい」で間違いに数えない", async ({ page }) => {
+  await seed(page, baseState({ session: session("lesson", "c12-l1", ["c12-l1-p1", "c1-l3-p2"]) }), "/play");
+  await type(page, "ZeroDevisionError");
+  await expect(page.getByText("正しいつづりは ZeroDivisionError です")).toBeVisible();
+  await next(page);
+  await type(page, "3");
+  await expect(page.getByText(/惜しい！/)).toBeVisible();
+  expect((await stored(page)).session.results["c1-l3-p2"]?.miss ?? 0).toBe(0);
+  await type(page, "3.0");
+  await expect(page.getByText("一発正解！")).toBeVisible();
+});
