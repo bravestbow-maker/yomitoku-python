@@ -62,7 +62,7 @@ export function Ring({ value, size = 64, stroke = 7, children, tone = "primary",
     return () => cancelAnimationFrame(t);
   }, [value]);
   return (
-    <div class={`ring tone-${tone}`} style={{ width: size, height: size }} role="img" aria-label={label}>
+    <div class={`ring tone-${tone}`} style={{ width: `${size}px`, height: `${size}px` }} role="img" aria-label={label}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <circle class="ring-track" cx={size / 2} cy={size / 2} r={r} stroke-width={stroke} fill="none" />
         <circle class="ring-fill" cx={size / 2} cy={size / 2} r={r} stroke-width={stroke} fill="none"

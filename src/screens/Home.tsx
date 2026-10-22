@@ -136,7 +136,7 @@ function CourseMap({ onOpen, currentId }: { onOpen: (id: string) => void; curren
   const xs = chapters.map((_, i) => 50 + Math.sin(i * 1.05) * 26);
   const h = chapters.length * ROW;
   return (
-    <section class="map" style={{ height: h }} aria-label="コースマップ">
+    <section class="map" style={{ height: `${h}px` }} aria-label="コースマップ">
       <svg class="map-path" viewBox={`0 0 100 ${h}`} preserveAspectRatio="none" aria-hidden="true">
         {chapters.slice(1).map((c, i) => {
           const a = chapters[i];
@@ -154,7 +154,7 @@ function CourseMap({ onOpen, currentId }: { onOpen: (id: string) => void; curren
         const st = chapterStatus(s, c);
         const done = lessonsDone(s, c);
         return (
-          <div class={`node st-${st}`} style={{ top: i * ROW, left: `${xs[i]}%` }} key={c.id}>
+          <div class={`node st-${st}`} style={{ top: `${i * ROW}px`, left: `${xs[i]}%` }} key={c.id}>
             <button class="node-btn" onClick={() => (st === "locked" ? toast("前の章をクリアするか、スキップすると開きます") : onOpen(c.id))}
               aria-label={`第${c.num}章 ${c.title}（${STATUS_LABEL[st]}）`}>
               {st === "current" && <Ring value={done / c.lessons.length} size={84} stroke={5} tone="primary" />}

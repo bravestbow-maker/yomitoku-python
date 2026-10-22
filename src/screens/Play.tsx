@@ -101,7 +101,10 @@ function ProblemView({ pid }: { pid: string }) {
     if (!solved) inputRef.current?.focus({ preventScroll: true });
   }, []);
   useEffect(() => {
-    if (solved) nextRef.current?.focus({ preventScroll: true });
+    if (!solved) return;
+    nextRef.current?.focus({ preventScroll: true });
+    const t = window.setTimeout(() => nextRef.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }), 250);
+    return () => clearTimeout(t);
   }, [solved]);
 
   // 下書きを保存（閉じても続きから）
@@ -375,7 +378,7 @@ function ProblemView({ pid }: { pid: string }) {
   const showReveal = !single && !solved && miss >= 3;
 
   return (
-    <div class="play">
+    <div class="play" data-pid={pid} data-solved={solved ? "1" : "0"}>
       <header class="play-head">
         <button class="icon-btn" onClick={quit} aria-label="中断してマップへ（続きは保存されます）"><Icon name="close" /></button>
         <div class="play-prog">
