@@ -29,8 +29,14 @@ export function speak(text: string, rateIdx: number): Promise<void> {
     const v = jaVoice();
     if (v) u.voice = v;
     u.rate = RATES[rateIdx] ?? 1;
-    u.onend = () => resolve();
-    u.onerror = () => resolve();
+    // 端末によっては終わりの知らせが来ないので、長さに合わせた時間で先へ進める
+    const limit = window.setTimeout(resolve, 1500 + (u.text.length * 260) / u.rate);
+    const done = () => {
+      clearTimeout(limit);
+      resolve();
+    };
+    u.onend = done;
+    u.onerror = done;
     speechSynthesis.speak(u);
   });
 }

@@ -327,3 +327,23 @@ test("全ページにエラーが出ない", async ({ page }) => {
 async function currentPidSafe(page: import("@playwright/test").Page) {
   return (await page.locator(".play").count()) ? currentPid(page) : null;
 }
+
+test("ボトムシートは下にスワイプすると閉じる", async ({ page }) => {
+  await seed(page, baseState(), "/");
+  await page.getByRole("button", { name: /第0章 はじめに/ }).click();
+  const grip = page.getByLabel("下にスワイプして閉じる");
+  await expect(grip).toBeVisible();
+  const box = (await grip.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2, box.y + 250, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+});
+
+test("通して音読：1行ずつ答え合わせして最後まで読める", async ({ page }) => {
+  await seed(page, baseState(), "/readthrough/c0-l1");
+  const step = page.locator(".rt-bar .btn.primary");
+  for (let i = 0; i < 40 && (await step.textContent()) !== "マップへ"; i++) await step.click();
+  await expect(page.getByText("最後まで読めました")).toBeVisible();
+});
